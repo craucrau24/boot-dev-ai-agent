@@ -1,12 +1,14 @@
 import pathlib
 
+from .utils import check_path_is_in_working_directory
+
 def get_file_content(working_directory, file_path):
   try:
     abs_path = pathlib.Path(working_directory, file_path).resolve()
   except:
     return f"Error: couldn't resolve {file_path}"
 
-  if not str(abs_path).startswith(str(pathlib.Path(working_directory).resolve())):
+  if not check_path_is_in_working_directory(working_directory, abs_path):
     return f'Error: Cannot list "{abs_path}" as it is outside the permitted working directory'
 
   if not abs_path.is_file():
