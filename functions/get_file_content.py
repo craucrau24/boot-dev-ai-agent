@@ -9,7 +9,7 @@ def get_file_content(working_directory, file_path):
     return f"Error: couldn't resolve {file_path}"
 
   if not check_path_is_in_working_directory(working_directory, abs_path):
-    return f'Error: Cannot list "{abs_path}" as it is outside the permitted working directory'
+    return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
 
   if not abs_path.is_file():
     return f'Error: File not found or is not a regular file: "{file_path}"'
