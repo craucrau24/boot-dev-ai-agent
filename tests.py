@@ -14,9 +14,17 @@ from functions.run_python_file import run_python_file
 #     get_file_content("calculator", "/bin/cat"),
 #     get_file_content("calculator", "pkg/does_not_exist.py")]
 
-operations = [write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum"),
-write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"),
-write_file("calculator", "/tmp/temp.txt", "this should not be allowed")]
+# operations = [write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum"),
+# write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"),
+# write_file("calculator", "/tmp/temp.txt", "this should not be allowed")]
+
+operations = [
+  run_python_file("calculator", "main.py"),
+  run_python_file("calculator", "main.py", ["3 + 5"]),
+  run_python_file("calculator", "tests.py"),
+  run_python_file("calculator", "../main.py"),
+  run_python_file("calculator", "nonexistent.py"),
+]
 
 for res in operations:
   print(res)
