@@ -1,6 +1,7 @@
 import pathlib
 
 from .utils import check_path_is_in_working_directory
+from .config import MAX_CONTENT_LENGTH
 
 def get_file_content(working_directory, file_path):
   try:
@@ -16,7 +17,7 @@ def get_file_content(working_directory, file_path):
 
   with open(abs_path, "r") as f:
     try:
-      contents = f.read(10000)
+      contents = f.read(MAX_CONTENT_LENGTH)
       if len(f.read(1)) != 0:
         contents += f"[...File \"{file_path}\" truncated at 10000 characters]"
     except IOError as e:
