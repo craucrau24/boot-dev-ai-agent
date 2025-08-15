@@ -11,6 +11,8 @@ from functions.write_file import schema_write_file
 
 from functions.call_function import call_function
 
+from utils import maybe
+
 if len(sys.argv) < 2:
   print("Missing prompt message")
   sys.exit(1)
@@ -61,10 +63,10 @@ function_calls = resp.function_calls if resp.function_calls is not None else []
 
 for function_call_part in function_calls:
     function_call_result = call_function(function_call_part, verbose)
-    if function_call_result.parts[0].function_response.response is None:
+    if maybe(function_call_result).parts[0].function_response.response.is_none():
         raise RuntimeError("unexpected emty response from function call")
     elif verbose:
-        print(f"-> {function_call_result.parts[0].function_response.response}")
+        print(f"-> {maybe(function_call_result).parts[0].function_response.response | ""}")
 
 
 
