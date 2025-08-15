@@ -5,6 +5,11 @@ from dotenv import load_dotenv
 from google.genai import types
 
 from functions.get_files_info import schema_get_files_info
+from functions.get_file_content import schema_get_file_content
+from functions.run_python_file import schema_run_python_file
+from functions.write_file import schema_write_file
+
+from functions.call_function import call_function
 
 if len(sys.argv) < 2:
   print("Missing prompt message")
@@ -25,6 +30,9 @@ You are a helpful AI coding agent.
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 
 - List files and directories
+- Read file contents
+- Execute Python files with optional arguments
+- Write or overwrite files
 
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
@@ -32,6 +40,9 @@ All paths you provide should be relative to the working directory. You do not ne
 available_functions = types.Tool(
     function_declarations=[
         schema_get_files_info,
+        schema_get_file_content,
+        schema_run_python_file,
+        schema_write_file
     ]
 )
 
@@ -45,11 +56,15 @@ resp = client.models.generate_content(
     contents=messages,
     config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt))
 
-print(resp.text)
+# print(resp.text)
 function_calls = resp.function_calls if resp.function_calls is not None else []
 
 for function_call_part in function_calls:
-    print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+    function_call_result = call_function(function_call_part, verbose)
+    if function_call_result.parts[0].function_response.response is None:
+        raise RuntimeError("unexpected emty response from function call")
+    elif verbose:
+        print(f"-> {function_call_result.parts[0].function_response.response}")
 
 
 

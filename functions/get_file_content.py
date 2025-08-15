@@ -1,5 +1,7 @@
 import pathlib
 
+from google.genai import types
+
 from .utils import check_path_is_in_working_directory
 from .config import MAX_CONTENT_LENGTH
 
@@ -24,3 +26,17 @@ def get_file_content(working_directory, file_path):
         return f"Error: error reading file \"{file_path}\" - {e}"
 
   return contents
+
+schema_get_file_content = types.FunctionDeclaration(
+  name="get_file_content",
+  description="Get content of a file, constrained to the working directory.",
+  parameters=types.Schema(
+      type=types.Type.OBJECT,
+      properties={
+          "file_path": types.Schema(
+              type=types.Type.STRING,
+              description="The path of the file to read from, relative to the working directory.",
+          ),
+      },
+  ),
+)
