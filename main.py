@@ -36,6 +36,7 @@ When a user asks a question or makes a request, make a function call plan. You c
 - Execute Python files with optional arguments
 - Write or overwrite files
 
+User don't need to know why you are calling each functions, just call them. You may begin with listing content of current directory to have better understanding of the base code. When you're done make a step by step summary.
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
 
@@ -53,26 +54,34 @@ messages = [
     types.Content(role="user", parts=[types.Part(text=user_prompt)]),
 ]
 
-resp = client.models.generate_content(
-    model="gemini-2.0-flash-001",
-    contents=messages,
-    config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt))
+for _ in range(10):
+    resp = client.models.generate_content(
+        model="gemini-2.0-flash-001",
+        contents=messages,
+        config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt))
 
-# print(resp.text)
-function_calls = resp.function_calls if resp.function_calls is not None else []
+    for candid in maybe(resp.candidates) | []:
+        messages.append(candid.content)
+    
+    function_calls = resp.function_calls if resp.function_calls is not None else []
 
-for function_call_part in function_calls:
-    function_call_result = call_function(function_call_part, verbose)
-    if maybe(function_call_result).parts[0].function_response.response.is_none():
-        raise RuntimeError("unexpected emty response from function call")
-    elif verbose:
-        print(f"-> {maybe(function_call_result).parts[0].function_response.response | ""}")
+    for function_call_part in function_calls:
+        function_call_result = call_function(function_call_part, verbose)
+        if maybe(function_call_result).parts[0].function_response.response.is_none():
+            raise RuntimeError("unexpected empty response from function call")
+        elif verbose:
+            print(f"-> {maybe(function_call_result).parts[0].function_response.response | ""}")
+        messages.append(function_call_result)
+
+    if resp.text is not None:
+        print(resp.text)
+        break
 
 
 
-if verbose:
-    print(f"""User prompt: {user_prompt}
-Prompt tokens: {resp.usage_metadata.prompt_token_count}
-Response tokens: {resp.usage_metadata.candidates_token_count}
-""")
+    if verbose:
+        print(f"""User prompt: {user_prompt}
+    Prompt tokens: {resp.usage_metadata.prompt_token_count}
+    Response tokens: {resp.usage_metadata.candidates_token_count}
+    """)
 

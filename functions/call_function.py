@@ -16,7 +16,7 @@ def call_function(function_call_part: types.FunctionCall, verbose=False):
   if verbose:
     print(f"Calling function: {function_call_part.name}({function_call_part.args})")
   else:
-    print(f"Calling function: {function_call_part.name}")
+    print(f"- Calling function: {function_call_part.name}")
 
   function_name = function_call_part.name
   if function_name is None: function_name = ""
@@ -28,7 +28,7 @@ def call_function(function_call_part: types.FunctionCall, verbose=False):
   if callable(func):
     function_result = func("./calculator", **args)
     return types.Content(
-      role="tool",
+      role="user",
       parts=[
           types.Part.from_function_response(
               name=function_name,
@@ -38,7 +38,7 @@ def call_function(function_call_part: types.FunctionCall, verbose=False):
   )
   else:
     return types.Content(
-        role="tool",
+        role="user",
         parts=[
             types.Part.from_function_response(
                 name=function_name,

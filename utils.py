@@ -23,7 +23,7 @@ class Maybe:
 
     return Maybe(self._inner[idx])
 
-  def __or__(self, value: Any) -> UnionType:
+  def __or__(self, value: Any) -> Any:
     if self._inner is None:
       return value
     return self._inner
