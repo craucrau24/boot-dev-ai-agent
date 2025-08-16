@@ -54,7 +54,7 @@ messages = [
     types.Content(role="user", parts=[types.Part(text=user_prompt)]),
 ]
 
-for _ in range(10):
+for _ in range(20):
     resp = client.models.generate_content(
         model="gemini-2.0-flash-001",
         contents=messages,
